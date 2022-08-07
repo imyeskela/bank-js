@@ -93,8 +93,9 @@ const createNicknames = function (accs) {
 
 createNicknames(accounts);
 
-const displayBalance = function (transactions) {
-  const balance = transactions.reduce((acc, trans) => acc + trans, 0);
+const displayBalance = function (account) {
+  const balance = account.transactions.reduce((acc, trans) => acc + trans, 0);
+  account.balance = balance;
   labelBalance.textContent = `${balance}$`;
 }
 
@@ -121,6 +122,14 @@ const displayTotal = function (transactions, interest) {
 
 let currentAccount;
 
+const updateUi = function (account){
+  displayBalance(account);
+  displayTotal(account.transactions, account.interest);
+  displayTransactions(account.transactions);
+
+}
+
+
 btnLogin.addEventListener('click', function (e){
   e.preventDefault();
   currentAccount = accounts.find(account => account.nickname === inputLoginUsername.value);
@@ -133,13 +142,28 @@ btnLogin.addEventListener('click', function (e){
     inputLoginUsername.value = '';
     inputLoginPin.value = '';
 
-    displayBalance(currentAccount.transactions);
-    displayTotal(currentAccount.transactions, currentAccount.interest);
-    displayTransactions(currentAccount.transactions);
-
+    updateUi(currentAccount);
 
   } else{
     alert('Incorrect username or pin. Please, try again.');
   }
 })
 
+btnTransfer.addEventListener('click', function (e) {
+  e.preventDefault();
+
+  const transferAmount = Number(inputTransferAmount.value);
+  const recipientNickname =  inputTransferTo.value;
+  const recipientAccount = accounts.find(account => account.nickname === recipientNickname);
+
+  if (transferAmount > 0 && currentAccount.balance >= transferAmount
+      && currentAccount.nickname !== recipientAccount?.nickname && recipientAccount){
+    currentAccount.transactions.push(-transferAmount);
+    recipientAccount.transactions.push(transferAmount);
+    updateUi(currentAccount);
+    inputTransferTo.value = '';
+    inputTransferAmount.value = '';
+  }else{
+   console.log('Error');
+  }
+})
