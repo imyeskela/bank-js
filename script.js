@@ -167,3 +167,22 @@ btnTransfer.addEventListener('click', function (e) {
    console.log('Error');
   }
 })
+
+btnClose.addEventListener('click', function (e) {
+  e.preventDefault();
+  const closePin = Number(inputClosePin.value);
+  const closeNickname = inputCloseUsername.value;
+
+  if (closeNickname === currentAccount.nickname && closePin === currentAccount.pin) {
+    const currentAccountIndex = accounts.findIndex(account => account.nickname === currentAccount.nickname);
+    accounts.splice(currentAccountIndex, 1);
+    containerApp.style.opacity = 0;
+    labelWelcome.textContent = 'Войдите в свой аккаунт';
+    inputCloseUsername.value = '';
+    inputClosePin.value = '';
+  }else{
+    console.log('error');
+  }
+  inputCloseUsername.value = '';
+  inputClosePin.value = '';
+});
