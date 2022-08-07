@@ -76,14 +76,13 @@ const displayTransactions = function (transactions) {
         <div class="transactions__type transactions__type--${transTypeStyle}">
             ${index+1} ${transType}
         </div>
-        <div class="transactions__value">${trans}</div>
+        <div class="transactions__value">${trans}$</div>
     </div>
     `
     containerTransactions.insertAdjacentHTML("afterbegin", transActionRow);
   });
 };
 
-displayTransactions(account1.transactions);
 
 const createNicknames = function (accs) {
   accs.forEach(function (acc){
@@ -96,17 +95,51 @@ createNicknames(accounts);
 
 const displayBalance = function (transactions) {
   const balance = transactions.reduce((acc, trans) => acc + trans, 0);
-  labelBalance.textContent = `${balance}`;
+  labelBalance.textContent = `${balance}$`;
 }
-displayBalance(account1.transactions);
 
 
+const displayTotal = function (transactions, interest) {
+  const depositsTotal = transactions.filter(trans => trans > 0)
+      .reduce((acc, trans) => acc + trans, 0);
+  const withdrawTotal = transactions.filter(trans => trans < 0)
+      .reduce((acc, trans) => acc + trans, 0);
+
+  const interestTotal = transactions
+      .filter(trans => trans > 0)
+      .map(dep => (dep * interest) / 100)
+      .filter((interes, index, arr) =>{
+        return interes >= 5;
+      })
+      .reduce((acc, inter) => acc + inter, 0);
+
+  labelSumIn.textContent = `${depositsTotal}$`;
+  labelSumOut.textContent = `${withdrawTotal}$`;
+  labelSumInterest.textContent = `${interestTotal}$`;
+}
 
 
+let currentAccount;
+
+btnLogin.addEventListener('click', function (e){
+  e.preventDefault();
+  currentAccount = accounts.find(account => account.nickname === inputLoginUsername.value);
+  // console.log(currentAccount);
+
+  if (currentAccount?.pin === Number(inputLoginPin.value)){
+    labelWelcome.textContent = `Рады, что вы снова с нами, ${currentAccount.userName.split(' ')[0]}!`;
+    containerApp.style.opacity = 100
+
+    inputLoginUsername.value = '';
+    inputLoginPin.value = '';
+
+    displayBalance(currentAccount.transactions);
+    displayTotal(currentAccount.transactions, currentAccount.interest);
+    displayTransactions(currentAccount.transactions);
 
 
-
-
-
-
+  } else{
+    alert('Incorrect username or pin. Please, try again.');
+  }
+})
 
