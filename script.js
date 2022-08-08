@@ -186,3 +186,22 @@ btnClose.addEventListener('click', function (e) {
   inputCloseUsername.value = '';
   inputClosePin.value = '';
 });
+
+
+btnLoan.addEventListener('click', function (e) {
+  e.preventDefault();
+
+  const loanAmount = Number(inputLoanAmount.value);
+  const loanAmountByPercent = (loanAmount * 20) / 100;
+  const balanceByPercent = (currentAccount.balance * 20) / 100;
+
+
+  if (loanAmount > 0 && balanceByPercent >= loanAmountByPercent){
+    currentAccount.transactions.push(loanAmount);
+    updateUi(currentAccount);
+
+  }else{
+    console.log('error');
+  }
+  inputLoanAmount.value = '';
+});
